@@ -7,14 +7,12 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.widget.ImageButton;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private static final int REQUEST_CAMERA_PERMISSION = 1;
     private CameraView mCameraView;
-    private ImageButton mImageButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +29,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void initView() {
         mCameraView = findViewById(R.id.cv_camera);
-        mImageButton = findViewById(R.id.ib_switch);
     }
 
     @Override

@@ -59,10 +59,24 @@ public class CameraView extends GLSurfaceView implements GLSurfaceView.Renderer 
     }
 
     public void onStop() {
-        mCameraRenderer.onStop();
+        runOnGLThread(new Runnable() {
+            @Override
+            public void run() {
+                mCameraRenderer.onStop();
+            }
+        });
     }
 
     public void onDestroy() {
-        mCameraRenderer.onDestroy();
+        runOnGLThread(new Runnable() {
+            @Override
+            public void run() {
+                mCameraRenderer.onDestroy();
+            }
+        });
+    }
+
+    public void runOnGLThread(final Runnable pRunnable) {
+        this.queueEvent(pRunnable);
     }
 }
