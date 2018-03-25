@@ -1,2 +1,5 @@
 # Camera
 使用谷歌Camera API 1，c++实现渲染在自己的shader上
+
+SurfaceTexture作为预览载体，但是它们所使用的SurfaceTexture传入的OpenGL texture object name必须为GL_TEXTURE_EXTERNAL_OES
+这种方式，实际上就是两个OpenGL Thread共享一个Texture，不再需要数据导入导出，从Camera采集的数据直接在GPU中完成转换和渲染
