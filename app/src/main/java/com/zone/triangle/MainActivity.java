@@ -12,7 +12,7 @@ import android.widget.Toast;
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private static final int REQUEST_CAMERA_PERMISSION = 1;
-    private CameraView mCameraView;
+    private CameraSurfaceView mCameraSurfaceView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,19 +28,31 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initView() {
-        mCameraView = findViewById(R.id.cv_camera);
+        mCameraSurfaceView = findViewById(R.id.cv_camera);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mCameraSurfaceView.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mCameraSurfaceView.onPause();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        mCameraView.onStop();
+        mCameraSurfaceView.onStop();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mCameraView.onDestroy();
+        mCameraSurfaceView.onDestroy();
     }
 
     @Override

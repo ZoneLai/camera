@@ -3,6 +3,7 @@ package com.zone.triangle;
 import android.graphics.Point;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
+import android.util.Log;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -14,18 +15,18 @@ import java.util.List;
  * Create on 2018/3/24.
  */
 
-public class Camera1 implements CameraViewImpl {
+public class CameraPreview implements CameraViewImpl, Camera.PreviewCallback {
     private Config mConfig;
-    private Camera mCamera;
+    private android.hardware.Camera mCamera;
     private CameraSizeComparator sizeComparator;
 
-    private Camera.Size picSize;
-    private Camera.Size preSize;
+    private android.hardware.Camera.Size picSize;
+    private android.hardware.Camera.Size preSize;
 
     private Point mPicSize;
     private Point mPreSize;
 
-    public Camera1() {
+    public CameraPreview() {
         mConfig = new Config();
         mConfig.minPreviewWidth = 720;
         mConfig.minPictureWidth = 720;
@@ -35,18 +36,19 @@ public class Camera1 implements CameraViewImpl {
 
     @Override
     public boolean open(int cameraId) {
-        mCamera = Camera.open(cameraId);
+        mCamera = android.hardware.Camera.open(cameraId);
         if (mCamera != null) {
-            Camera.Parameters param = mCamera.getParameters();
+            android.hardware.Camera.Parameters param = mCamera.getParameters();
             picSize = getPropPictureSize(param.getSupportedPictureSizes(), mConfig.rate, mConfig.minPictureWidth);
             preSize = getPropPreviewSize(param.getSupportedPreviewSizes(), mConfig.rate, mConfig.minPreviewWidth);
             param.setPictureSize(picSize.width, picSize.height);
             param.setPreviewSize(preSize.width, preSize.height);
             mCamera.setParameters(param);
-            Camera.Size pre = param.getPreviewSize();
-            Camera.Size pic = param.getPictureSize();
+            android.hardware.Camera.Size pre = param.getPreviewSize();
+            android.hardware.Camera.Size pic = param.getPictureSize();
             mPicSize = new Point(pic.height, pic.width);
             mPreSize = new Point(pre.height, pre.width);
+            mCamera.setPreviewCallback(this);
             return true;
         }
         return false;
@@ -113,20 +115,13 @@ public class Camera1 implements CameraViewImpl {
 
     @Override
     public void setOnPreviewFrameCallback(final PreviewFrameCallback callback) {
-        if (mCamera != null) {
-            mCamera.setPreviewCallback(new Camera.PreviewCallback() {
-                @Override
-                public void onPreviewFrame(byte[] data, Camera camera) {
-                    callback.onPreviewFrame(data, mPreSize.x, mPreSize.y);
-                }
-            });
-        }
+
     }
 
-    private Camera.Size getPropPreviewSize(List<Camera.Size> list, float th, int minWidth) {
+    private android.hardware.Camera.Size getPropPreviewSize(List<android.hardware.Camera.Size> list, float th, int minWidth) {
         Collections.sort(list, sizeComparator);
         int i = 0;
-        for (Camera.Size s : list) {
+        for (android.hardware.Camera.Size s : list) {
             if ((s.height >= minWidth) && equalRate(s, th)) {
                 break;
             }
@@ -138,10 +133,10 @@ public class Camera1 implements CameraViewImpl {
         return list.get(i);
     }
 
-    private Camera.Size getPropPictureSize(List<Camera.Size> list, float th, int minWidth) {
+    private android.hardware.Camera.Size getPropPictureSize(List<android.hardware.Camera.Size> list, float th, int minWidth) {
         Collections.sort(list, sizeComparator);
         int i = 0;
-        for (Camera.Size s : list) {
+        for (android.hardware.Camera.Size s : list) {
             if ((s.height >= minWidth) && equalRate(s, th)) {
                 break;
             }
@@ -153,7 +148,7 @@ public class Camera1 implements CameraViewImpl {
         return list.get(i);
     }
 
-    private boolean equalRate(Camera.Size s, float rate) {
+    private boolean equalRate(android.hardware.Camera.Size s, float rate) {
         float r = (float) (s.width) / (float) (s.height);
         if (Math.abs(r - rate) <= 0.03) {
             return true;
@@ -162,8 +157,13 @@ public class Camera1 implements CameraViewImpl {
         }
     }
 
-    private class CameraSizeComparator implements Comparator<Camera.Size> {
-        public int compare(Camera.Size lhs, Camera.Size rhs) {
+    @Override
+    public void onPreviewFrame(byte[] data, Camera camera) {
+        Log.e("xx", "onPreviewFrame: " + data.length);
+    }
+
+    private class CameraSizeComparator implements Comparator<android.hardware.Camera.Size> {
+        public int compare(android.hardware.Camera.Size lhs, android.hardware.Camera.Size rhs) {
             // TODO Auto-generated method stub
             if (lhs.height == rhs.height) {
                 return 0;
